@@ -1,7 +1,7 @@
 # Sleuth Differential Expression Analysis
 ### Ovarian Cancer Cell Lines — OV8 & OV90 (Sensitive vs Resistant)
 
-**Original Script Author:** Jared McLendon, McLendon Lab, University of Iowa  
+**Original Script Author:** Jared McLendon, University of Iowa  
 **Modified:** Atonu Chakrabortty, McLendon Lab, University of Iowa  
 **Date:** April 05, 2026  
 **Platform:** UIowa Argon HPC Cluster
@@ -85,7 +85,7 @@ RNA-seq reads were previously quantified using **Kallisto** (Bray et al., 2016),
 
 ### Why Sleuth?
 
-When you run Kallisto, it doesn't just give you one estimate of transcript abundance — it runs bootstrap resampling internally to capture how uncertain each estimate is. That uncertainty is real and matters: two transcripts can have the same mean expression level but very different confidence around that mean depending on how well the reads aligned.
+When we run Kallisto, it doesn't just give us one estimate of transcript abundance — it runs bootstrap resampling internally to capture how uncertain each estimate is. That uncertainty is real and matters: two transcripts can have the same mean expression level but very different confidence around that mean depending on how well the reads aligned.
 
 Standard DE tools like DESeq2 and edgeR only see a single count matrix. They have no idea about that uncertainty — it gets lost. Sleuth is designed specifically to take Kallisto's bootstrap output and use it. It models variance as two separate components:
 
@@ -109,7 +109,7 @@ Two complementary tests are run:
 - **Likelihood Ratio Test (LRT):** Compares the full model to the reduced model. Asks — *does knowing the condition actually help explain the expression pattern?* Returns a p-value but no direction or magnitude.
 - **Wald Test (WT):** Estimates the **b coefficient** for the condition variable — this is effectively the effect size (analogous to log fold change). Gives direction and magnitude of change, plus its own p-value and q-value.
 
-Running both is intentional. The LRT is better for identifying genes where the model fit improves (broad signal), while the Wald test tells you how big the effect is and in which direction. Results from both tests are merged into a single output table. Genes significant in both are the most reliable hits.
+Running both is intentional. The LRT is better for identifying genes where the model fit improves (broad signal), while the Wald test tells us how big the effect is and in which direction. Results from both tests are merged into a single output table. Genes significant in both are the most reliable hits.
 
 ### Analysis Levels
 
@@ -126,7 +126,7 @@ Before any differential expression testing, the script runs a global setup on al
 - PCA plot of all samples colored by group
 - Sample-level heatmap with clustering
 
-This is useful for quality control — you can check whether samples cluster as expected by group, spot any outliers, and get an overview of the whole dataset before looking at individual comparisons.
+This is useful for quality control — we can check whether samples cluster as expected by group, spot any outliers, and get an overview of the whole dataset before looking at individual comparisons.
 
 ---
 
@@ -178,7 +178,8 @@ conda activate sleuth
 conda install -c conda-forge "r-data.table=1.14.8" -y
 ```
 
-> **Note on biomaRt:** The original professor's script imported `library(biomaRt)` for gene annotation lookups. This was removed because: (1) biomaRt requires outbound internet access to query Ensembl, which Argon compute nodes block; (2) the t2g mapping file (`cdna_t2g_map.tsv`) already contains all the gene annotation needed — biomaRt was redundant. Do not attempt to install or use biomaRt on Argon compute nodes.
+> **Note on biomaRt:** The Dr.McLendon's script imported `library(biomaRt)` for gene annotation lookups. This was removed because: (1) biomaRt requires outbound internet access to query Ensembl, which Argon compute nodes block; (2) the t2g mapping file (`cdna_t2g_map.tsv`) already contains all the gene annotation needed — biomaRt was redundant. Do not attempt to install or use biomaRt on Argon compute nodes.
+> TL:DR: Do not install biomart
 
 ### Verify installation
 
@@ -274,7 +275,7 @@ scp sleuth_run.R sleuth_master.job \
 qsub sleuth_master.job
 ```
 
-### What happens when you submit
+### What happens when we submit
 
 1. SGE allocates a node on the **UI-HM** (high-memory) queue with 4 cores and 256GB RAM
 2. The job loops `i` from 1 to 10
@@ -543,7 +544,7 @@ This section documents how the pipeline evolved — what was tried, what broke, 
 
 ### Starting point: the professor's script
 
-The starting point was Jared McLendon's original Sleuth script, written for a different project. It was designed to run two binary comparisons (resistant vs sensitive, for OV90 and OV8) and was structured as a single, self-contained R script that you'd run once.
+The starting point was Dr.McLendon's original Sleuth script. It was designed to run two binary comparisons (resistant vs sensitive, for OV90 and OV8) and was structured as a single, self-contained R script that we'd run once.
 
 The structure was:
 
@@ -643,7 +644,7 @@ for i in 1 2 3 4 5 6 7 8 9 10; do
 done
 ```
 
-Each comparison's output goes to its own console file, which makes debugging easier — if comparison 7 fails, you check `sleuth_comp7_console.txt` without having to dig through one giant log.
+Each comparison's output goes to its own console file, which makes debugging easier — if comparison 7 fails, we check `sleuth_comp7_console.txt` without having to dig through one giant log.
 
 ---
 
